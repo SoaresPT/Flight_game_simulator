@@ -1,4 +1,5 @@
 import psycopg2
+import random
 from configparser import ConfigParser
 
 
@@ -24,23 +25,23 @@ def connect():
     """ Connect to the PostgreSQL database server """
     conn = None
     try:
-        # read connection parameters
         params = config()
 
-        # connect to the PostgreSQL server
         print('Connecting to the PostgreSQL database...')
         conn = psycopg2.connect(**params)
-
-        # create a cursor
         cur = conn.cursor()
 
-        # execute a statement
-        print('PostgreSQL database version:')
-        cur.execute('SELECT version()')
-
-        # display the PostgreSQL database server version
-        db_version = cur.fetchone()
-        print(db_version)
+        def get_random_airports():
+            airports_list = []
+            while len(airports_list) < 5:
+                sql_db_length = f"SELECT city FROM airport WHERE id = '{random.randint(1, 42)}';"
+                cur.execute(sql_db_length)
+                result = cur.fetchall()
+                if result[0][0] not in airports_list:
+                    airports_list.append(result[0][0])
+            return airports_list
+        generated_5_airports = get_random_airports()
+        print(generated_5_airports)
 
         # close the communication with the PostgreSQL
         cur.close()
