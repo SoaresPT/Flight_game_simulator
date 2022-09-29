@@ -2,7 +2,6 @@ import psycopg2
 from psycopg2 import extensions
 from configparser import ConfigParser
 import sys
-import random
 from geopy.distance import geodesic as GD
 
 """
@@ -62,10 +61,6 @@ def closeDBConnection():
         if conn is not None:
             conn.close()
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-    connect()
-=======
 """ Game Functions """
 
 def search_username():
@@ -111,10 +106,15 @@ if __name__ == "__main__":
     while True:
         if option == "1":
             # Ask user to type a username
-            username = input("Type your username: ").capitalize()
-            if len(username) > 20:            
-                username = username[:20]
-                print(f"Username trimmed to {username}")
+            while True:
+                username = input("Type your username: ").capitalize()
+                if len(username) == 0:
+                    print("Username cannot be empty!")
+                    continue
+                if len(username) > 20:
+                    print(f"Your username is too long! Please use at most 20 characters for your username.")
+                    continue
+                break
             break
         elif option == "2":
             print("Thank you for playing!")
@@ -135,10 +135,8 @@ if __name__ == "__main__":
     
     #Generates 5 airports and prints the results...
     print("Generating 5 random airports...")
-    for i in range(100):
-        generated_5_airports = get_random_airports()
-        print(generated_5_airports)
+    generated_5_airports = get_random_airports()
+    print(generated_5_airports)
+    
     # Just forcefully closing this to be 100% sure no connection gets stuck but elephantSQL seems to have a very short keep-alive time which can be annoying for production... Let's see
     closeDBConnection()
-    #print("Closed connection")
->>>>>>> login/new_game
