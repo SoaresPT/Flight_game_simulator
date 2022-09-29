@@ -60,10 +60,21 @@ def closeDBConnection():
 
 def search_username():
     try:
-        select_username_query = f"SELECT username FROM player WHERE username = {username}"
-        cur.execute(select_username_query)
+        select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
+        cur.execute(select_id_from_username_query)
+        username_row = cur.fetchall()
+        return len(username_row) # returns how many results the query returned
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)    
+
+def add_username(username: str):
+    try:
+        add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
+        cur.execute(add_new_user)
+        conn.commit()
+        return f"{username} has been added to the database!"
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)        
 
 def login_screen():
     print("\t\t-- Flight Game --")
@@ -89,21 +100,18 @@ if __name__ == "__main__":
             sys.exit(1)
         else:
             option = input("Invalid choice. Please type your choice again: ")
-        
+
+    # Connect to the DB after user chose to start playing    
     connectDB()
 
-    # Greet new/old user
-    select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
-    cur.execute(select_id_from_username_query)
-    username_row = cur.fetchall()
-    if len(username_row) == 0:
+    # Add new user to the DB or greet an old user
+    if search_username() == 0:
         print("Adding new user to the database...")
-        add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
-        cur.execute(add_new_user)
-        conn.commit()
+        add_username(username)
         print(f"Welcome, {username}!")
     else:
         print(f"Welcome back, {username}!")
-        
+
+    # Just forcefully closing this to be 100% sure no connection gets stuck but elephantSQL seems to have a very short keep-alive time which can be annoying for production... Let's see
     closeDBConnection()
     #print("Closed connection")
