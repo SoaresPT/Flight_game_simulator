@@ -3,6 +3,7 @@ from psycopg2 import extensions
 from configparser import ConfigParser
 import sys
 import random
+from geopy.distance import geodesic as GD
 
 """
 Basic Connection Functions
@@ -85,7 +86,7 @@ def add_username(username: str):
 def get_random_airports():
     airports_list = []
     while len(airports_list) < 5:
-        sql_db_length = f"SELECT city FROM airport WHERE id = '{random.randint(1, 42)}';"
+        sql_db_length = f"SELECT city FROM airport WHERE id = (SELECT id FROM airport order by random() limit 1);"
         cur.execute(sql_db_length)
         result = cur.fetchall()
         if result[0][0] not in airports_list:
