@@ -2,8 +2,11 @@ import psycopg2
 from psycopg2 import extensions
 from configparser import ConfigParser
 import sys
+import random
 
-
+"""
+Basic Connection Functions
+"""
 def config(filename='database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
@@ -58,6 +61,8 @@ def closeDBConnection():
         if conn is not None:
             conn.close()
 
+""" Game Functions """
+
 def search_username():
     try:
         select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
@@ -75,6 +80,17 @@ def add_username(username: str):
         return f"{username} has been added to the database!"
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)        
+
+# Get 5 random airports in a list
+def get_random_airports():
+    airports_list = []
+    while len(airports_list) < 5:
+        sql_db_length = f"SELECT city FROM airport WHERE id = '{random.randint(1, 42)}';"
+        cur.execute(sql_db_length)
+        result = cur.fetchall()
+        if result[0][0] not in airports_list:
+            airports_list.append(result[0][0])
+    return airports_list
 
 def login_screen():
     print("\t\t-- Flight Game --")
@@ -111,7 +127,11 @@ if __name__ == "__main__":
         print(f"Welcome, {username}!")
     else:
         print(f"Welcome back, {username}!")
-
+    
+    #Generates 5 airports and prints the results...
+    print("Generating 5 random airports...")
+    generated_5_airports = get_random_airports()
+    print(generated_5_airports)
     # Just forcefully closing this to be 100% sure no connection gets stuck but elephantSQL seems to have a very short keep-alive time which can be annoying for production... Let's see
     closeDBConnection()
     #print("Closed connection")
