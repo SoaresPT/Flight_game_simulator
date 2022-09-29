@@ -86,7 +86,7 @@ def add_username(username: str):
 def get_random_airports():
     airports_list = []
     while len(airports_list) < 5:
-        sql_db_length = f"SELECT city FROM airport WHERE id = (SELECT id FROM airport order by random() limit 1);"
+        sql_db_length = f"SELECT city FROM airport WHERE icao = (SELECT icao FROM airport order by random() limit 1);"
         cur.execute(sql_db_length)
         result = cur.fetchall()
         if result[0][0] not in airports_list:
@@ -131,8 +131,9 @@ if __name__ == "__main__":
     
     #Generates 5 airports and prints the results...
     print("Generating 5 random airports...")
-    generated_5_airports = get_random_airports()
-    print(generated_5_airports)
+    for i in range(100):
+        generated_5_airports = get_random_airports()
+        print(generated_5_airports)
     # Just forcefully closing this to be 100% sure no connection gets stuck but elephantSQL seems to have a very short keep-alive time which can be annoying for production... Let's see
     closeDBConnection()
     #print("Closed connection")
