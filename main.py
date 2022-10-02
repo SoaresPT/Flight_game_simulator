@@ -105,6 +105,14 @@ def default_city():
     current_city = result[0]
     return result[0]
 
+def closeDBConnection():
+    try:
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)    
+    finally:
+        if conn is not None:
+            conn.close()
 
 if __name__ == "__main__":
     connectDB()
@@ -114,4 +122,4 @@ if __name__ == "__main__":
     print("\n")
     close_airports = airports_nearby()
     print(flight_target(airports_nearby()))
-    
+    closeDBConnection()
