@@ -59,11 +59,18 @@ def get_random_airports():
         sql_db_length = f"SELECT city, country FROM airport WHERE icao = (SELECT icao FROM airport order by random() limit 1);"
         cur.execute(sql_db_length)
         result = cur.fetchall()
-        # So no target airport will be same as starting one
-        if result[0][0] not in airports_list and result[0][0] != current_city[-1]:
+        # Generate X number of random airports. Make sure it's not a repeated one and different than the starting location
+        if result[0] not in airports_list and result[0][0] != current_city[-1]:
             airports_tuple = (result[0][0], result[0][1])
+        else:
+            continue
         airports_list.append(airports_tuple)
     return airports_list
+
+# Iterate and print the list of airports the user must travel to. This outputs in a nicer format the contents of get_random_airports()
+def print_airports(airport_list: list):
+    for index, tup in enumerate(airport_list):
+        print(f"{tup[0]}, {tup[1]}")
 
 # Find airports nearby
 def airports_nearby():
@@ -99,11 +106,11 @@ def update_curr_location():
 
 def default_city():
     global current_city
-    start_city = f"SELECT * FROM airport WHERE icao = 'EFHK';"
-    cur.execute(start_city)
+    start_city_query = f"SELECT * FROM airport WHERE icao = 'EFHK';"
+    cur.execute(start_city_query)
     result = cur.fetchall()
     current_city = result[0]
-    return result[0]
+    return current_city
 
 def closeDBConnection():
     try:
@@ -114,12 +121,75 @@ def closeDBConnection():
         if conn is not None:
             conn.close()
 
+""" Game Functions """
+
+def search_username():
+    try:
+        select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
+        cur.execute(select_id_from_username_query)
+        username_row = cur.fetchall()
+        return len(username_row) # returns how many results the query returned
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)    
+
+def add_username(username: str):
+    try:
+        add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
+        cur.execute(add_new_user)
+        conn.commit()
+        return f"{username} has been added to the database!"
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+def login_screen():
+    print("\t\t-- Flight Game --")
+    print("\t\t[1] Create new game")
+    print("\t\t[2] Exit")
+
 if __name__ == "__main__":
+    login_screen()
+
+    # Main Menu Selection
+    option = input("Type your choice: ")
+    while True:
+        if option == "1":
+            # Ask user to type a username
+            while True:
+                username = input("Type your username: ").capitalize()
+                if len(username) == 0:
+                    print("Username cannot be empty!")
+                    continue
+                if len(username) > 20:
+                    print(f"Your username is too long! Please use at most 20 characters for your username.")
+                    continue
+                break
+            break
+        elif option == "2":
+            print("Thank you for playing!")
+            sys.exit(1)
+        else:
+            option = input("Invalid choice. Please type your choice again: ")
+    
+    # Connect to the DB after the user selects the nickname
     connectDB()
+
+    # Add new user to the DB or greet an old user
+    if search_username() == 0:
+        print("Adding new user to the database...")
+        add_username(username)
+        print(f"Welcome, {username}!")
+    else:
+        print(f"Welcome back, {username}!")
+    
+    # Populate the current_city global var -- TO DO: Change this as it's clunky af
     default_city()
+
+    # Grab the 5 closest airports to the current location
     generated_5_airports = get_random_airports()
-    print(*generated_5_airports)             # ['Ljubljana', 'Riga', 'Prague', 'Valletta', 'Fontvieille']
+    print_airports(generated_5_airports)
     print("\n")
-    close_airports = airports_nearby()
-    print(flight_target(airports_nearby()))
+    #close_airports = airports_nearby()
+    #print(flight_target(close_airports))
+
+    # forcefully closing this to be 100% sure no connection gets stuck 
     closeDBConnection()
