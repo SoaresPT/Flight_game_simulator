@@ -1,7 +1,6 @@
 import random
 import main
 import psycopg2
-from configparser import ConfigParser
 
 
 def get_random_airports():
