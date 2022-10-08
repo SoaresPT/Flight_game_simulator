@@ -201,15 +201,28 @@ if __name__ == "__main__":
     print_airports(generated_5_airports)
     print("\n")
 
-    print("You are flying a small place and so you have limited fuel. You can travel to any of these airports to refuel:")
+    print("You are flying a small place and so you have limited fuel. You can travel to any of these airports:")
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
         destination = flight_target(nearby_airports)
-        current_city_country = f"{destination[-1]}, {destination[-2]}"
+        current_city_country = f"{destination[-1]},{destination[-2]}"
         current_location = destination
         update_curr_location()
         print(f"You're now in {current_city_country}")
+        # Uncomment when debugging if needed - Remove later
+        #print(generated_5_airports)
+        
+        # Edit this later to make it less sphagetti - Leaving this now for future debugging purposes
+        if (current_location[-1], current_location[-2]) not in generated_5_airports:
+            #print(f"{(current_location[-1], current_location[-2])} is not in {generated_5_airports}")
+            print(".")
+        else:
+            print(f"Nicely done! You delivered your package at one of your destinations {current_city_country}")
+            generated_5_airports.remove((current_location[-1],current_location[-2]))
+            print(f"You have the following destinations left:")
+            print_airports(generated_5_airports)
+    print("Good shit. You finished the game!")
 
 
     
