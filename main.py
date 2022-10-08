@@ -91,7 +91,17 @@ def flight_target(airports: list):
     print("Select destination: ")
     for i in range(len(airports)):
         print(f"\t{i+1} - {airports[i][-1]}, {airports[i][-2]}")
-    user_choice = int(input("> "))
+    while True:
+        try:
+            user_choice = int(input("> "))
+        except ValueError:
+            print("Invalid input. Input a airport number from the list above.")
+            continue
+        else:
+            if user_choice <= 0 or user_choice > len(airports):
+                print("The selected airport is not valid!")
+                continue
+        break
     target_city = airports[user_choice-1]
     return target_city
 
@@ -102,7 +112,6 @@ def update_curr_location():
     cur.execute(get_info)
     conn.commit()
     res = cur.fetchall()
-    print(res)
     return res
 
 def starting_location():
