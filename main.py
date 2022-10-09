@@ -8,6 +8,7 @@ from geopy import distance
 Basic Connection Functions
 """
 
+
 def config(filename='database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
@@ -20,7 +21,7 @@ def config(filename='database.ini', section='postgresql'):
         for param in params:
             db[param[0]] = param[1]
     else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+        raise Exception(f'Section {0} not found in the {1} file'.format(section, filename))
     return db
 
 
@@ -54,6 +55,7 @@ def connectDB():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+
 def get_random_airports():
     airports_list = []
     while len(airports_list) < 5:
@@ -68,20 +70,23 @@ def get_random_airports():
         airports_list.append(airports_tuple)
     return airports_list
 
+
 # Iterate and print the list of airports the user must travel to. This outputs in a nicer format the contents of get_random_airports()
 def print_airports(airport_list: list):
     for index, tup in enumerate(airport_list):
         print(f"\t{tup[0]}, {tup[1]}")
 
+
 def print_airports_single_line(airport_list: list):
     airports_str = ""
     for index, tup in enumerate(airport_list):
-        airports_str += f"{tup[0]}, {tup[1]} | "
+        airports_str += f"{tup[0]}, {tup[1]} || "
     return airports_str[0:-2]
 
 # Find airports nearby
+
+
 def airports_nearby():
-    flight_range = 800
     reachable_airports = []
     nearby = f"SELECT * from airport where city != '{current_location[-1]}';"
     cur.execute(nearby)
@@ -92,6 +97,8 @@ def airports_nearby():
     return reachable_airports
 
 # add debug if number out of the list. Later on
+
+
 def flight_target(airports: list):
     print("Select destination: ")
     for i in range(len(airports)):
@@ -110,14 +117,18 @@ def flight_target(airports: list):
     target_city = airports[user_choice-1]
     return target_city
 
+
+
 def update_curr_location():
     current = f"UPDATE player SET curr_location = '{current_city_country}' WHERE username = '{username}';"
     cur.execute(current)
+    all_places_visited.append(current_city_country)
     get_info = f"SELECT * from player WHERE username = '{username}';"
     cur.execute(get_info)
     conn.commit()
     res = cur.fetchall()
     return res
+
 
 def starting_location():
     global current_location
@@ -127,25 +138,28 @@ def starting_location():
     current_location = result[0]
     return current_location
 
+
 def closeDBConnection():
     try:
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)    
+        print(error)
     finally:
         if conn is not None:
             conn.close()
 
 """ Game Functions """
 
-def search_username():
-    try:
-        select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
-        cur.execute(select_id_from_username_query)
-        username_row = cur.fetchall()
-        return len(username_row) # returns how many results the query returned
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)    
+
+# def search_username():
+#     try:
+#         select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
+#         cur.execute(select_id_from_username_query)
+#         username_row = cur.fetchall()
+#         return len(username_row) # returns how many results the query returned
+#     except (Exception, psycopg2.DatabaseError) as error:
+#         print(error)
+
 
 def add_username(username: str):
     try:
@@ -156,13 +170,16 @@ def add_username(username: str):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+
 def login_screen():
     print("\t\t-- Flight Game --")
     print("\t\t[1] Create new game")
     print("\t\t[2] Exit")
 
+
 def test_ascii():
-    print("""\
+    user = username + (" " * (20 - len(username)))
+    print(f"""\
         .----.                                                   .'.
         |  /   '                                                 |  '
         |  |    '                                                '  :
@@ -170,18 +187,24 @@ def test_ascii():
         |  |      '          .\\   .//'._+_________.'.'  /_________\|
         |  |___ ...'.__..--~~ .\\__//_.-     . . .' .'  /      :  |  `.
         |.-"  .'  /                          . .' .'   /.      :_.|__.'
-       <    .'___/                           .' .'    /|.      : .'|\\
+       <    .'___/    {user}   .' .'    /|.      : .'|\\
         ~~--..                             .' .'     /_|.      : | | \\
           /_.' ~~--..__             .----.'_.'      /. . . . . . | |  |
                       ~~--.._______'.__.'  .'      /____________.' :  /
                                .'   .''.._'______.'                '-'
                                '---'
-                               """)            
+                               """)
+
+
+#def all_cities_visited():
+
 
 if __name__ == "__main__":
     # Vars initialization
     total_turns = 0
     co2_wasted = 0 # Need to find a way to calculate this
+    all_places_visited = []
+    flight_range = 800
 
     # Call login screen at the start of the game
     login_screen()
@@ -206,29 +229,33 @@ if __name__ == "__main__":
             sys.exit(1)
         else:
             option = input("Invalid choice. Please type your choice again: ")
-    
+
     # Connect to the DB after the user selects the nickname
     connectDB()
 
     # Add new user to the DB or greet an old user
-    if search_username() == 0:
-        print("Adding new user to the database...")
-        add_username(username)
-        print(f"Welcome, {username}!")
-    else:
-        print(f"Welcome back, {username}!")
-    
+    add_username(username)
+    print(f"Welcome, {username}!")
+    test_ascii()
+
     # Populate the current_location - Currently will always be Helsinki
     current_location = starting_location()
     current_city_country = f"{current_location[-1]}, {current_location[-2]}"
-    print(f"Your mission is to deliver packages to the following airports. You starting position is {current_city_country}. Good luck!")
-    print(f"Reach these airports by any order:")
+    print(f"You are a new pilot in the FedEx."
+          f"\nYour mission is to deliver packages to the following airports.\n"
+          f"You are flying Boeing 737-400 with the fuel limited to {flight_range} km.\n"
+          f"If you can't reach your target destination directly, you have to fly by cities that are on the way,"
+          f" and refill the fuel tank.\n"
+          f"Try using most efficient roots in order to generate less carbon footprint &"
+          f" save company's operational costs.\n"
+          f"You starting position is {current_city_country}. Good luck!")
+    print(f"Reach these airports in any order:")
     # Grab the 5 closest airports to the current location
     generated_5_airports = get_random_airports()
     print_airports(generated_5_airports)
     print("\n")
 
-    print("You are flying a small place and so you have limited fuel. You can travel to any of these airports:")
+    print(f"From {current_city_country} can travel to any of these airports:")
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
@@ -237,20 +264,25 @@ if __name__ == "__main__":
         current_location = destination
         update_curr_location()
         total_turns += 1
-        print(f"You're now in {current_city_country}. You still need to deliver your package to the following airport(s) in: {print_airports_single_line(generated_5_airports)}")
+        print(f"You're now in {current_city_country}.")
+        if current_city_country not in generated_5_airports:
+            print(f"You need to deliver your package to the following airport(s) "
+              f"in: {print_airports_single_line(generated_5_airports)}\n")
         # Uncomment when debugging if needed - Remove later
         #print(generated_5_airports)
-        
+
         # Edit this later to make it less sphagetti - Leaving this now for future debugging purposes
         if (current_location[-1], current_location[-2]) in generated_5_airports:
-            print(f"Nicely done! You delivered your package at one of your destinations {current_city_country}.")
-            generated_5_airports.remove((current_location[-1],current_location[-2]))
-            print(f"You have the following destinations left:")
+            print(f"Nicely done! You have delivered your package to one of your destinations {current_city_country}.")
+            generated_5_airports.remove((current_location[-1], current_location[-2]))
+            print(f"You have the following destinations left:\n")
             print_airports(generated_5_airports)
     print(f"Congratulations!! You finished the game!")
+    print(f" You have visited:{', '.join(all_places_visited)}")
+    print(all_places_visited)
     print(f"It took you {total_turns} turns to deliver all the packages. The total CO2 wasted was {co2_wasted}")
 
 
-    
-    # forcefully closing this to be 100% sure no connection gets stuck 
+
+    # forcefully closing this to be 100% sure no connection gets stuck
     closeDBConnection()
