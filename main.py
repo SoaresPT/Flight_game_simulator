@@ -73,12 +73,17 @@ def print_airports(airport_list: list):
     for index, tup in enumerate(airport_list):
         print(f"\t{tup[0]}, {tup[1]}")
 
+def print_airports_single_line(airport_list: list):
+    airports_str = ""
+    for index, tup in enumerate(airport_list):
+        airports_str += f"{tup[0]}, {tup[1]} | "
+    return airports_str[0:-2]
+
 # Find airports nearby
 def airports_nearby():
     flight_range = 800
     reachable_airports = []
-    # for i in range(airport_table_length):
-    nearby = f"SELECT * from airport where city != '{current_location[-1]}';"  # [(52.3086, 4.76389), (59.4133, 24.8328), (48.1103, 16.5697), (44.0203, 12.6117), (47.4298, 19.2611), (49.0128, 2.55), (43.8246, 18.3315), (55.9726, 37.4146), (52.3514, 13.4939), (45.7429, 16.0688), (52.1657, 20.9671), (50.9014, 4.48444), (38.7813, -9.13592), (35.8575, 14.4775), (55.6179, 12.656), (43.7258, 7.41967), (42.3594, 19.2519), (41.8045, 12.252), (41.9616, 21.6214), (60.1939, 11.1004), (53.8881, 28.04), (53.4213, -6.27007), (49.6233, 6.20444), (42.6967, 23.4114), (59.6519, 17.9186), (42.3386, 1.40917), (56.9236, 23.9711), (37.9364, 23.9445), (44.5711, 26.085), (46.9277, 28.931), (64.13, -21.9406), (50.1008, 14.26), (48.1702, 17.2127), (44.8184, 20.3091), (54.6341, 25.2858), (51.5053, 0.055278), (50.345, 30.8947), (41.4147, 19.7206), (46.9141, 7.49715), (46.2237, 14.4576), (40.4719, -3.56264)]
+    nearby = f"SELECT * from airport where city != '{current_location[-1]}';"
     cur.execute(nearby)
     result = cur.fetchall()
     for coords in result:
@@ -156,9 +161,31 @@ def login_screen():
     print("\t\t[1] Create new game")
     print("\t\t[2] Exit")
 
-if __name__ == "__main__":
-    login_screen()
+def test_ascii():
+    print("""\
+        .----.                                                   .'.
+        |  /   '                                                 |  '
+        |  |    '                                                '  :
+        |  |     '             .-~~~-.               .-~-.        \ |
+        |  |      '          .\\   .//'._+_________.'.'  /_________\|
+        |  |___ ...'.__..--~~ .\\__//_.-     . . .' .'  /      :  |  `.
+        |.-"  .'  /                          . .' .'   /.      :_.|__.'
+       <    .'___/                           .' .'    /|.      : .'|\\
+        ~~--..                             .' .'     /_|.      : | | \\
+          /_.' ~~--..__             .----.'_.'      /. . . . . . | |  |
+                      ~~--.._______'.__.'  .'      /____________.' :  /
+                               .'   .''.._'______.'                '-'
+                               '---'
+                               """)            
 
+if __name__ == "__main__":
+    # Vars initialization
+    total_turns = 0
+    co2_wasted = 0 # Need to find a way to calculate this
+
+    # Call login screen at the start of the game
+    login_screen()
+    #test_ascii()
     # Main Menu Selection
     option = input("Type your choice: ")
     while True:
@@ -209,27 +236,21 @@ if __name__ == "__main__":
         current_city_country = f"{destination[-1]},{destination[-2]}"
         current_location = destination
         update_curr_location()
-        print(f"You're now in {current_city_country}")
+        total_turns += 1
+        print(f"You're now in {current_city_country}. You still need to deliver your package to the following airport(s) in: {print_airports_single_line(generated_5_airports)}")
         # Uncomment when debugging if needed - Remove later
         #print(generated_5_airports)
         
         # Edit this later to make it less sphagetti - Leaving this now for future debugging purposes
-        if (current_location[-1], current_location[-2]) not in generated_5_airports:
-            #print(f"{(current_location[-1], current_location[-2])} is not in {generated_5_airports}")
-            print(".")
-        else:
-            print(f"Nicely done! You delivered your package at one of your destinations {current_city_country}")
+        if (current_location[-1], current_location[-2]) in generated_5_airports:
+            print(f"Nicely done! You delivered your package at one of your destinations {current_city_country}.")
             generated_5_airports.remove((current_location[-1],current_location[-2]))
             print(f"You have the following destinations left:")
             print_airports(generated_5_airports)
-    print("Good shit. You finished the game!")
+    print(f"Congratulations!! You finished the game!")
+    print(f"It took you {total_turns} turns to deliver all the packages. The total CO2 wasted was {co2_wasted}")
 
 
     
     # forcefully closing this to be 100% sure no connection gets stuck 
     closeDBConnection()
-    """
-    This will remove a city, country from the list of tuples - TO DO LATER
-    """
-    #generated_5_airports.remove(("Vienna", "Austria"))
-    #print(generated_5_airports)
