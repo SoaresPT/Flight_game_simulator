@@ -25,9 +25,8 @@ def config(filename='database.ini', section='postgresql'):
     return db
 
 
-def connectDB():
+def connect_db():
     # global variables to keep connection open and cursor quieries inside functions
-
     global conn
     global cur
     """ Connect to the PostgreSQL database server """
@@ -83,6 +82,7 @@ def print_airports_single_line(airport_list: list):
         airports_str += f"{tup[0]}, {tup[1]} || "
     return airports_str[0:-2]
 
+
 # Find airports nearby
 
 
@@ -96,13 +96,14 @@ def airports_nearby():
             reachable_airports.append(coords)
     return reachable_airports
 
+
 # add debug if number out of the list. Later on
 
 
 def flight_target(airports: list):
     print("Select destination: ")
     for i in range(len(airports)):
-        print(f"\t{i+1} - {airports[i][-1]}, {airports[i][-2]}")
+        print(f"\t{i + 1} - {airports[i][-1]}, {airports[i][-2]}")
     while True:
         try:
             user_choice = int(input("> "))
@@ -114,9 +115,8 @@ def flight_target(airports: list):
                 print("The selected airport is not valid!")
                 continue
         break
-    target_city = airports[user_choice-1]
+    target_city = airports[user_choice - 1]
     return target_city
-
 
 
 def update_curr_location():
@@ -130,6 +130,11 @@ def update_curr_location():
     return res
 
 
+def total_travel_distance(airport_from, airport_to):
+    dist = distance.distance(airport_from, airport_to).km
+    return dist
+
+
 def starting_location():
     global current_location
     start_city_query = f"SELECT * FROM airport WHERE icao = 'EFHK';"
@@ -139,7 +144,7 @@ def starting_location():
     return current_location
 
 
-def closeDBConnection():
+def close_db_connection():
     try:
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -147,6 +152,7 @@ def closeDBConnection():
     finally:
         if conn is not None:
             conn.close()
+
 
 """ Game Functions """
 
@@ -196,19 +202,21 @@ def test_ascii():
                                """)
 
 
-#def all_cities_visited():
+# def all_cities_visited():
 
 
 if __name__ == "__main__":
     # Vars initialization
     total_turns = 0
-    co2_wasted = 0 # Need to find a way to calculate this
+    co2_wasted = 0  # Need to find a way to calculate this
     all_places_visited = []
     flight_range = 800
+    total_dist = 0.0
+
 
     # Call login screen at the start of the game
     login_screen()
-    #test_ascii()
+    # test_ascii()
     # Main Menu Selection
     option = input("Type your choice: ")
     while True:
@@ -231,7 +239,7 @@ if __name__ == "__main__":
             option = input("Invalid choice. Please type your choice again: ")
 
     # Connect to the DB after the user selects the nickname
-    connectDB()
+    connect_db()
 
     # Add new user to the DB or greet an old user
     add_username(username)
@@ -240,6 +248,8 @@ if __name__ == "__main__":
 
     # Populate the current_location - Currently will always be Helsinki
     current_location = starting_location()
+    print(current_location)
+    print(("current location"))
     current_city_country = f"{current_location[-1]}, {current_location[-2]}"
     print(f"You are a new pilot in the FedEx."
           f"\nYour mission is to deliver packages to the following airports.\n"
@@ -259,17 +269,21 @@ if __name__ == "__main__":
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
+        travel_from = [current_location[2], current_location[3]]
         destination = flight_target(nearby_airports)
+        travel_to = [destination[2], destination[3]]
         current_city_country = f"{destination[-1]},{destination[-2]}"
         current_location = destination
         update_curr_location()
+        total_dist += total_travel_distance(travel_from, travel_to)
+        print(total_dist)
         total_turns += 1
         print(f"You're now in {current_city_country}.")
-        if current_city_country not in generated_5_airports:
+        if current_city_country not in generated_5_airports:  # fix
             print(f"You need to deliver your package to the following airport(s) "
-              f"in: {print_airports_single_line(generated_5_airports)}\n")
+                  f"in: {print_airports_single_line(generated_5_airports)}\n")
         # Uncomment when debugging if needed - Remove later
-        #print(generated_5_airports)
+        # print(generated_5_airports)
 
         # Edit this later to make it less sphagetti - Leaving this now for future debugging purposes
         if (current_location[-1], current_location[-2]) in generated_5_airports:
@@ -280,9 +294,8 @@ if __name__ == "__main__":
     print(f"Congratulations!! You finished the game!")
     print(f" You have visited:{', '.join(all_places_visited)}")
     print(all_places_visited)
-    print(f"It took you {total_turns} turns to deliver all the packages. The total CO2 wasted was {co2_wasted}")
-
-
+    print(f"It took you {total_turns} turns to deliver all the packages.\n"
+          f"The total distance travelled - {total_dist:.2f} km. The total CO2 wasted was {co2_wasted}")
 
     # forcefully closing this to be 100% sure no connection gets stuck
-    closeDBConnection()
+    close_db_connection()
