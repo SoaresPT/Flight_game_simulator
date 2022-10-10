@@ -101,7 +101,7 @@ def airports_nearby():
 
 
 def flight_target(airports: list):
-    print("Select destination: ")
+    print("Select your next destination: ")
     for i in range(len(airports)):
         print(f"\t{i + 1} - {airports[i][-1]}, {airports[i][-2]}")
     while True:
@@ -263,7 +263,8 @@ if __name__ == "__main__":
     # Grab the 5 closest airports to the current location
     generated_5_airports = get_random_airports()
     print_airports(generated_5_airports)
-    print("\n")
+    print("")
+
 
     print(f"From {current_city_country} can travel to any of these airports:")
 
@@ -272,26 +273,33 @@ if __name__ == "__main__":
         travel_from = [current_location[2], current_location[3]]
         destination = flight_target(nearby_airports)
         travel_to = [destination[2], destination[3]]
-        current_city_country = f"{destination[-1]},{destination[-2]}"
+        current_city_country = f"{destination[-1]}, {destination[-2]}"
         current_location = destination
         update_curr_location()
         total_dist += total_travel_distance(travel_from, travel_to)
-        print(total_dist)
         total_turns += 1
-        print(f"You're now in {current_city_country}.")
-        if current_city_country not in generated_5_airports:  # fix
-            print(f"You need to deliver your package to the following airport(s) "
-                  f"in: {print_airports_single_line(generated_5_airports)}\n")
+        print(f"You're now in {current_city_country}.\n")
+        for city_from_gen_list in generated_5_airports:
+            if (current_location[-1], current_location[-2]) in generated_5_airports:
+                generated_5_airports.remove((current_location[-1], current_location[-2]))
+                if len(generated_5_airports) == 0:
+                    break
+                print(f"Nicely done!\n"
+                      f"You have delivered a package to {current_location[-1]} - one of your target destinations.")
+                print(f"You have the following destinations left:")
+                print_airports(generated_5_airports)
+                print("")
+                break
+            elif destination[-1] != city_from_gen_list[0]:
+                print(f"You need to deliver your package to the following airport(s) in: \n"
+                      f"{print_airports_single_line(generated_5_airports)}")
+                break
         # Uncomment when debugging if needed - Remove later
         # print(generated_5_airports)
 
         # Edit this later to make it less sphagetti - Leaving this now for future debugging purposes
-        if (current_location[-1], current_location[-2]) in generated_5_airports:
-            print(f"Nicely done! You have delivered your package to one of your destinations {current_city_country}.")
-            generated_5_airports.remove((current_location[-1], current_location[-2]))
-            print(f"You have the following destinations left:\n")
-            print_airports(generated_5_airports)
-    print(f"Congratulations!! You finished the game!")
+
+    print(f"Congratulations!!! You have reached your final destination and finished the game!")
     print(f" You have visited:{', '.join(all_places_visited)}")
     print(all_places_visited)
     print(f"It took you {total_turns} turns to deliver all the packages.\n"
