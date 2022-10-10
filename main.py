@@ -72,16 +72,12 @@ def get_random_airports():
 
 # Iterate and print the list of airports the user must travel to.
 # This outputs in a nicer format the contents of get_random_airports()
+
 def print_airports(airport_list: list):
-    for index, tup in enumerate(airport_list):
-        print(f"\t{tup[0]}, {tup[1]}")
-
-
-def print_airports_single_line(airport_list: list):
     airports_str = ""
     for index, tup in enumerate(airport_list):
         airports_str += f"{tup[0]}, {tup[1]} || "
-    return airports_str[0:-2]
+    print(airports_str[0:-3])
 
 
 # Find airports nearby
@@ -149,6 +145,18 @@ def co2_calculator(target_cities_list: list):
     if list_length in co2_packages_left:
         co2_per_journey = co2_packages_left[list_length] * total_travel_distance(travel_from, travel_to)
     return co2_per_journey
+
+
+def co2_per_trip(target_cities_list: list):
+    co2_packages_left = {
+        1: 8.24,
+        2: 16.62,
+        3: 25,
+        4: 33.24,
+        5: 41.62
+    }
+    list_length = len(target_cities_list)
+    return co2_packages_left.get(list_length)
 
 
 def starting_location():
@@ -286,15 +294,16 @@ if __name__ == "__main__":
                 if len(generated_5_airports) == 0:
                     break
                 print(f"Nicely done!\n"
-                      f"You have delivered a package to {current_location[-1]} - one of your target destinations.")
-                # ADD 'now you dropped some cargo so your co2 emission decreased to {value from function} kg per km'
+                      f"You have delivered a package to {current_location[-1]} - one of your target destinations.\n"
+                f"Now you dropped some cargo so your co2 emission decreased to {co2_per_trip(generated_5_airports)} "
+                      f"kg per km.")
                 print(f"You have the following destinations left:")
                 print_airports(generated_5_airports)
                 print("")
                 break
             elif destination[-1] != city_from_gen_list[0]:
-                print(f"You need to deliver your package to the following airport(s) in: \n"
-                      f"{print_airports_single_line(generated_5_airports)}")
+                print(f"You need to deliver your package to the following airport(s) in: \n")
+                print_airports(generated_5_airports)
                 break
         # Uncomment when debugging if needed - Remove later
         # print(generated_5_airports)
