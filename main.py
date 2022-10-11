@@ -78,7 +78,7 @@ def get_random_airports():
 def print_airports(airport_list: list):
     airports_str = ""
     for index, tup in enumerate(airport_list):
-        airports_str += f"{tup[0]}, {tup[1]} || "
+        airports_str += f"{Fore.RED}{tup[0]}, {tup[1]} || "
     print(airports_str[0:-3])
 
 
@@ -245,6 +245,17 @@ def welcome_ascii():
                                """)
 
 
+def landing_ascii():
+    print(f"""{Fore.LIGHTCYAN_EX}
+          */ | \*
+          / -+- \\
+      ---o--(_)--o---
+        /  0 " 0  \\
+      */     |     \*
+      /      |      \\
+""")
+
+
 if __name__ == "__main__":
     # Vars initialization
     total_turns = 0
@@ -309,7 +320,7 @@ if __name__ == "__main__":
     print_airports(generated_5_airports)
     print("")
 
-    print(f"From {current_city_country} can travel to any of these cities:")
+    print(f"From {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTGREEN_EX} can travel to any of these cities:")
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
@@ -323,7 +334,8 @@ if __name__ == "__main__":
         total_co2_wasted += co2_calculator(generated_5_airports)
         total_dist += total_travel_distance(travel_from, travel_to)
         total_turns += 1
-        print(f"You're now in {current_city_country}.\n")
+        landing_ascii()
+        print(f"You're now in {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTGREEN_EX}.\n")
         for city_from_gen_list in generated_5_airports:
             if (current_location[-1], current_location[-2]) in generated_5_airports:
                 generated_5_airports.remove((current_location[-1], current_location[-2]))
