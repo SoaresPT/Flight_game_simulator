@@ -3,6 +3,8 @@ from psycopg2 import extensions
 from configparser import ConfigParser
 import sys
 from geopy import distance
+import colorama
+from colorama import Fore, Back, Style
 
 """
 Basic Connection Functions
@@ -36,15 +38,15 @@ def connect_db():
         params = config()
 
         # connect to the PostgreSQL server
-        print('Connecting to the game database...')
+        print(f'{Fore.LIGHTBLUE_EX}Connecting to the game database...')
         try:
             conn = psycopg2.connect(**params)
         except psycopg2.OperationalError as e:
-            print(f'Error: {e}')
+            print(f'{Fore.RED}Error: {e}')
             sys.exit(1)
         # Test if connection was successful
         if conn.status == extensions.STATUS_READY:
-            print("Successfully connected to the game server!\n\n")
+            print(f"{Fore.LIGHTGREEN_EX}Successfully connected to the game server!\n\n")
         else:
             print("Error connecting to the database. Cannot start the game.")
             sys.exit(1)
@@ -120,6 +122,8 @@ def flight_target(airports: list):
 def update_curr_location():
     current = f"UPDATE player SET curr_location = '{current_city_country}' WHERE username = '{username}';"
     cur.execute(current)
+    insert_game_turn_query = f"INSERT INTO GAME(game_id, player_id, city_visited) VALUES ({game_id}, {player_id}, '{current_city_country}')"
+    cur.execute(insert_game_turn_query)
     all_places_visited.append(current_city_country)
     get_info = f"SELECT * from player WHERE username = '{username}';"
     cur.execute(get_info)
@@ -167,6 +171,21 @@ def starting_location():
     current_location = result[0]
     return current_location
 
+def get_game_id():
+    game_id_query = f"SELECT MAX(game_id) from game;"
+    cur.execute(game_id_query)
+    game_id = cur.fetchone()
+    if game_id[0] is None: # If there's no records on the table
+        game_id = 1
+    else:
+        game_id = game_id[0] + 1
+    return game_id
+
+def get_player_id():
+    player_id_query = f"SELECT id from player where username ='{username}'"
+    cur.execute(player_id_query)
+    player_id = cur.fetchone()
+    return player_id[0]
 
 def close_db_connection():
     try:
@@ -180,15 +199,24 @@ def close_db_connection():
 
 """ Game Functions """
 
+def search_username():
+    try:
+        select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
+        cur.execute(select_id_from_username_query)
+        username_row = cur.fetchall()
+        return len(username_row) # returns how many results the query returned
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error) 
+
 
 def add_username(username: str):
     try:
         add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
         cur.execute(add_new_user)
         conn.commit()
-        print(f"{username} has been added to the database!")
+        #print(f"{username} has been added to the database!")
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        print(f"{Fore.RED}{error}")
 
 
 def login_screen():
@@ -200,14 +228,15 @@ def login_screen():
 def welcome_ascii():
     user = username + (" " * (20 - len(username)))
     print(f"""\
+        {Fore.BLUE}
         .----.                                                   .'.
         |  /   '                                                 |  '
         |  |    '                                                '  :
         |  |     '             .-~~~-.               .-~-.        \ |
         |  |      '          .\\   .//'._+_________.'.'  /_________\|
         |  |___ ...'.__..--~~ .\\__//_.-     . . .' .'  /      :  |  `.
-        |.-"  .'  /                          . .' .'   /.      :_.|__.'
-       <    .'___/    {user}   .' .'    /|.      : .'|\\
+        |.-"  .'  /  {Fore.GREEN}Welcome Pilot{Fore.BLUE}           . .' .'   /.      :_.|__.'
+       <    .'___/    {Fore.YELLOW}{user}{Fore.BLUE}   .' .'    /|.      : .'|\\
         ~~--..                             .' .'     /_|.      : | | \\
           /_.' ~~--..__             .----.'_.'      /. . . . . . | |  |
                       ~~--.._______'.__.'  .'      /____________.' :  /
@@ -223,6 +252,9 @@ if __name__ == "__main__":
     all_places_visited = []
     flight_range = 800
     total_dist = 0.0
+    colorama.init(autoreset=True)
+    # Colorama video tutorial : https://youtu.be/u51Zjlnui4Y?t=475
+    # Colorama colors list : https://stackoverflow.com/q/61686780
 
     # Call login screen at the start of the game
     login_screen()
@@ -250,23 +282,27 @@ if __name__ == "__main__":
     # Connect to the DB after the user selects the nickname
     connect_db()
 
-    # Add new user to the DB or greet an old user
-    add_username(username)
-    print(f"Welcome, {username}!")
+    # Add new user to the DB if it doesn't exist
+    if search_username() == 0:
+        add_username(username)
+    #print(f"Welcome, {username}!")
+
+    # Grab current player ID and assign a new game_id for this session so we can log the player's movements
+    game_id = get_game_id()
+    player_id = get_player_id()
     welcome_ascii()
 
     # Populate the current_location - Currently will always be Helsinki
     current_location = starting_location()
     current_city_country = f"{current_location[-1]}, {current_location[-2]}"
-    print(f"You are a new pilot in the FedEx."
-          f"\nYour mission is to deliver packages to the following airports.\n"
+    print(f"{Fore.CYAN}You are a new pilot of FedEx.\n"
+          f"Your mission is to deliver packages to the following airports.\n"
           f"You are flying Boeing 737-400 with the fuel limited to {flight_range} km flight range.\n"
           f"If you can't reach your target destination directly, you have to fly by cities that are on the way,"
           f" and refill the fuel tank.\n"
-          f"Try using most efficient roots in order to generate less carbon footprint &"
-          f" save company's operational costs.\n"
-          f"HINT: The fewer packages you carry, the less CO2 emission you generate!\n"
-          f"You starting position is {current_city_country}. Good luck & have fun!")
+          f"Try using most efficient roots in order to generate less carbon footprint & save company's operational costs.\n"
+          f"{Fore.RED}{Style.BRIGHT}HINT: The fewer packages you carry, the less CO2 emission you generate!\n"
+          f"{Fore.CYAN}You starting position is {current_city_country}. Good luck & have fun!\n")
     print(f"Reach these airports in any order:")
     # Grab the 5 closest airports to the current location
     generated_5_airports = get_random_airports()
