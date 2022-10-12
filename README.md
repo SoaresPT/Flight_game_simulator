@@ -24,3 +24,19 @@ Write something about the game here... TODO
 <details>
 <img src="https://i.imgur.com/uDG72P1.png">
 </details>
+
+## Executing the game on a terminal shell
+It is highly recommended to run the game on a terminal window due to coding practices we've used to clear the terminal in order to simulate animations.
+1. Right click the Project Name `Flight_game_simulator` and Click `Copy Path/Reference...` followed by `Absolute Path`
+<details>
+<img src="https://i.imgur.com/IYH0nu5.png">
+<img src="https://i.imgur.com/BVI0udR.png">
+</details>
+2. Open a terminal window and navigate to that folder.
+<details>
+<img src="https://i.imgur.com/GDSwP7g.png">
+</details>
+
+On windows you can open the start menu and type `cmd` and select the Command Prompt. Type `cd` (give a space after the **d**) and right click on the window to paste the Path you previously copied from Pycharm
+
+Press the `Enter` key and you'll be inside the project's directory. Launch the game by typing `.\main.py` (This may not work if you set PyCharm as the default intreperter) so another way is to run: `python main.py`
