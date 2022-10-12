@@ -2,6 +2,8 @@ import psycopg2
 from psycopg2 import extensions
 from configparser import ConfigParser
 import sys
+import os
+import time
 from geopy import distance
 import colorama
 from colorama import Fore, Back, Style
@@ -255,6 +257,26 @@ def landing_ascii():
       /      |      \\
 """)
 
+def small_airplane():
+    #size = os.get_terminal_size()
+    #print(size.columns)
+    for i in range(0, 5):
+        print(f'''
+        Flying to {current_city_country} {i* "..."}
+{i* "          "}              _
+{i* "          "}            -=\`\\
+{i* "          "}        |\ ____\_\__
+{i* "          "}    -=\c`""""""" "` )
+{i* "          "}        `~~~~~/ /~~`
+{i* "          "}            -==/ /
+{i* "          "}              '-'
+        ''')
+        time.sleep(0.7)
+        clear_screen()
+    #clear_screen()        
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear') # cross-platform clear screen
 
 if __name__ == "__main__":
     # Vars initialization
@@ -320,7 +342,7 @@ if __name__ == "__main__":
     print_airports(generated_5_airports)
     print("")
 
-    print(f"From {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTGREEN_EX} can travel to any of these cities:")
+    print(f"From {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.RESET} can travel to any of these cities:")
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
@@ -334,8 +356,9 @@ if __name__ == "__main__":
         total_co2_wasted += co2_calculator(generated_5_airports)
         total_dist += total_travel_distance(travel_from, travel_to)
         total_turns += 1
+        small_airplane()
         landing_ascii()
-        print(f"You're now in {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTGREEN_EX}.\n")
+        print(f"You're now in {Fore.LIGHTGREEN_EX}{current_city_country}.\n")
         for city_from_gen_list in generated_5_airports:
             if (current_location[-1], current_location[-2]) in generated_5_airports:
                 generated_5_airports.remove((current_location[-1], current_location[-2]))
