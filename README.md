@@ -40,3 +40,21 @@ It is highly recommended to run the game on a terminal window due to coding prac
 On windows you can open the start menu and type `cmd` and select the Command Prompt. Type `cd` (give a space after the **d**) and right click on the window to paste the Path you previously copied from Pycharm
 
 Press the `Enter` key and you'll be inside the project's directory. Launch the game by typing `.\main.py` (This may not work if you set PyCharm as the default intreperter) so another way is to run: `python main.py`
+
+
+## Install
+
+- python 3.10
+- pip 22.2.2
+
+Before installing python packages from requirements file make sure postgresql is installed
+
+For Mac users:
+```bash
+brew install postgresql
+brew services start postgresql
+```
+
+```bash
+pip install -r requirements.txt
+```
