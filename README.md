@@ -1,5 +1,5 @@
 # Flight Game
-Write something about the game here... TODO
+
 ## Importing the game to pycharm
 1. Open PyCharm and Click the Button **"Get from VCS"**
 <details>
