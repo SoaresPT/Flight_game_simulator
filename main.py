@@ -80,7 +80,7 @@ def get_random_airports():
 def print_airports(airport_list: list):
     airports_str = ""
     for index, tup in enumerate(airport_list):
-        airports_str += f"{Fore.RED}{tup[0]}, {tup[1]} || "
+        airports_str += f"{Fore.LIGHTRED_EX}{tup[0]}, {tup[1]} || "
     print(airports_str[0:-3])
 
 
@@ -103,9 +103,9 @@ def airports_nearby():
 
 def flight_target(airports: list):
     print("")
-    print("Select your next destination: ")
+    print(f"{Fore.LIGHTWHITE_EX}Select your next destination: ")
     for i in range(len(airports)):
-        print(f"\t{i + 1} - {airports[i][-1]}, {airports[i][-2]}")
+        print(f"{Fore.LIGHTGREEN_EX}\t{i + 1} - {airports[i][-1]}, {airports[i][-2]}")
     while True:
         try:
             user_choice = int(input("> "))
@@ -297,9 +297,9 @@ def convert_list_to_dict(final: list):
 def print_total_visited(dict_countries):
     for country, num_of_visits in dict_countries.items():
         if num_of_visits > 1:
-            print(f"{country} - {num_of_visits} times")
+            print(f"{Fore.LIGHTGREEN_EX}{country} - {num_of_visits} times")
         else:
-            print(f"{country}")
+            print(f"{Fore.LIGHTGREEN_EX}{country}")
 
 
 if __name__ == "__main__":
@@ -350,25 +350,35 @@ if __name__ == "__main__":
     game_id = get_game_id()
     player_id = get_player_id()
     welcome_ascii()
-
+    time.sleep(2)
     # Populate the current_location - Currently will always be Helsinki
     current_location = starting_location()
     current_city_country = f"{current_location[-1]}, {current_location[-2]}"
-    print(f"{Fore.CYAN}You are a new pilot of FedEx.\n"
-          f"Your mission is to deliver packages to the following airports.\n"
-          f"You are flying Boeing 737-400 with the fuel limited to {flight_range} km flight range.\n"
-          f"If you can't reach your target destination directly, you have to fly by cities that are on the way,"
-          f" and refill the fuel tank.\n"
-          f"Try using most efficient roots in order to generate less carbon footprint & save company's operational costs.\n"
-          f"{Fore.RED}{Style.BRIGHT}HINT: The fewer packages you carry, the less CO2 emission you generate!\n"
-          f"{Fore.CYAN}You starting position is {current_city_country}. Good luck & have fun!\n")
-    print(f"Reach these airports in any order:")
+    print(f"{Fore.LIGHTWHITE_EX}You are a new pilot of FedEx.")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}Your mission is to deliver packages to the airports listed in your flight task.")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}You are flying {Fore.LIGHTGREEN_EX}Boeing 737-400{Fore.LIGHTWHITE_EX} with the payload of {Fore.LIGHTGREEN_EX}23,000kg{Fore.LIGHTWHITE_EX} and flight range is restricted to {Fore.LIGHTGREEN_EX}{flight_range} km{Fore.LIGHTWHITE_EX} due to fuel constrains.")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}If you can't reach your target destination directly, you have to fly by cities that are on the"
+          f" way, and refill the fuel tank.")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}Try using most efficient roots in order to generate less carbon footprint &"
+          f" save company's operational costs.")
+    time.sleep(2)
+    print(f"{Fore.RED}{Style.BRIGHT}HINT: The fewer packages you carry, the less CO2 emission you generate!")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}You starting position is {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTWHITE_EX}."
+          f" Good luck & have fun!")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}Reach these airports in any order:")
     # Grab the 5 closest airports to the current location
     generated_5_airports = get_random_airports()
     print_airports(generated_5_airports)
+    time.sleep(3)
     print("")
 
-    print(f"From {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.RESET} can travel to any of these cities:")
+    print(f"{Fore.LIGHTWHITE_EX}From {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTWHITE_EX} can travel to any of these cities:")
 
     while len(generated_5_airports) > 0:
         nearby_airports = airports_nearby()
@@ -384,32 +394,41 @@ if __name__ == "__main__":
         total_turns += 1
         # small_airplane()
         # landing_ascii()
-        print(f"You're now in {Fore.LIGHTGREEN_EX}{current_city_country}.\n")
+        print(f"{Fore.LIGHTWHITE_EX}You're now in {Fore.LIGHTGREEN_EX}{current_city_country}.\n")
         for city_from_gen_list in generated_5_airports:
             if (current_location[-1], current_location[-2]) in generated_5_airports:
                 generated_5_airports.remove((current_location[-1], current_location[-2]))
                 if len(generated_5_airports) == 0:
                     break
-                print(f"Nicely done!\n"
-                      f"You have delivered a package to {current_location[-1]} - one of your target destinations.\n"
-                      f"Now you dropped some cargo so your co2 emission decreased to {co2_per_trip(generated_5_airports)} "
-                      f"kg per km.")
-                print(f"You have the following destinations left:")
+                print(f"{Fore.LIGHTWHITE_EX}Nicely done!")
+                time.sleep(1)
+                print(f"{Fore.LIGHTWHITE_EX}You have delivered a package to {Fore.LIGHTBLUE_EX}{current_location[-1]}{Fore.LIGHTWHITE_EX} - one of your target destinations.")
+                time.sleep(1)
+                print(f"{Fore.LIGHTWHITE_EX}Now you dropped some cargo so your co2 emission decreased to {Fore.LIGHTRED_EX}{co2_per_trip(generated_5_airports)} "
+                      f"kg {Fore.LIGHTWHITE_EX}per km.")
+                time.sleep(1)
+                print(f"{Fore.LIGHTWHITE_EX}You have the following destinations left:")
                 print_airports(generated_5_airports)
                 print("")
                 break
             elif destination[-1] != city_from_gen_list[0]:
-                print(f"You need to deliver your package to the following airport(s) in: \n")
+                print(f"{Fore.LIGHTWHITE_EX}You need to deliver your package to the following airport(s) in: ")
                 print_airports(generated_5_airports)
                 break
-    print(f"Congratulations!!!\nYou have reached your final destination and finished the game!")
+    print(f"{Fore.LIGHTBLUE_EX}Congratulations!!!")
+    time.sleep(1)
+    print(f"{Fore.LIGHTWHITE_EX}You have reached your final destination and finished the game!")
     dict_visits = convert_list_to_dict(all_places_visited)
-    print(f"You have visited: {len(dict_visits)} countries:")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}You have visited {Fore.LIGHTGREEN_EX}{len(dict_visits)}{Fore.LIGHTWHITE_EX} countries:")
     print_total_visited(dict_visits)
-    print(f"It took you {total_turns} turns to deliver all the packages.\n"
-          f"The total travelled distance is {total_dist:.2f} km.\n"
-          f"The total carbon emission is {total_co2_wasted:.2f} kg CO2\n"
-          f"GGWP")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}It took you {Fore.LIGHTGREEN_EX}{total_turns}{Fore.LIGHTWHITE_EX} turns to deliver all the packages.")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}The total travelled distance is {Fore.LIGHTGREEN_EX}{total_dist:.2f} km")
+    time.sleep(2)
+    print(f"{Fore.LIGHTWHITE_EX}The total carbon emission is {Fore.LIGHTRED_EX}{total_co2_wasted:.2f} kg CO2")
+
 
     # Remove comments below when understand how co2 emission calculated
 
