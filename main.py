@@ -173,21 +173,24 @@ def starting_location():
     current_location = result[0]
     return current_location
 
+
 def get_game_id():
     game_id_query = f"SELECT MAX(game_id) from game;"
     cur.execute(game_id_query)
     game_id = cur.fetchone()
-    if game_id[0] is None: # If there's no records on the table
+    if game_id[0] is None:  # If there's no records on the table
         game_id = 1
     else:
         game_id = game_id[0] + 1
     return game_id
+
 
 def get_player_id():
     player_id_query = f"SELECT id from player where username ='{username}'"
     cur.execute(player_id_query)
     player_id = cur.fetchone()
     return player_id[0]
+
 
 def close_db_connection():
     try:
@@ -201,14 +204,15 @@ def close_db_connection():
 
 """ Game Functions """
 
+
 def search_username():
     try:
         select_id_from_username_query = f"SELECT id FROM player WHERE username = '{username}'"
         cur.execute(select_id_from_username_query)
         username_row = cur.fetchall()
-        return len(username_row) # returns how many results the query returned
+        return len(username_row)  # returns how many results the query returned
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error) 
+        print(error)
 
 
 def add_username(username: str):
@@ -216,7 +220,7 @@ def add_username(username: str):
         add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
         cur.execute(add_new_user)
         conn.commit()
-        #print(f"{username} has been added to the database!")
+        # print(f"{username} has been added to the database!")
     except (Exception, psycopg2.DatabaseError) as error:
         print(f"{Fore.RED}{error}")
 
@@ -257,32 +261,54 @@ def landing_ascii():
       /      |      \\
 """)
 
+
 def small_airplane():
-    #size = os.get_terminal_size()
-    #print(size.columns)
+    # size = os.get_terminal_size()
+    # print(size.columns)
     for i in range(0, 5):
         print(f'''
-        Flying to {current_city_country} {i* "..."}
-{i* "          "}              _
-{i* "          "}            -=\`\\
-{i* "          "}        |\ ____\_\__
-{i* "          "}    -=\c`""""""" "` )
-{i* "          "}        `~~~~~/ /~~`
-{i* "          "}            -==/ /
-{i* "          "}              '-'
+        Flying to {current_city_country} {i * "..."}
+{i * "          "}              _
+{i * "          "}            -=\`\\
+{i * "          "}        |\ ____\_\__
+{i * "          "}    -=\c`""""""" "` )
+{i * "          "}        `~~~~~/ /~~`
+{i * "          "}            -==/ /
+{i * "          "}              '-'
         ''')
         time.sleep(0.7)
         clear_screen()
-    #clear_screen()        
+    # clear_screen()
+
 
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear') # cross-platform clear screen
+    os.system('cls' if os.name == 'nt' else 'clear')  # cross-platform clear screen
+
+
+def convert_list_to_dict(final: list):
+    for value in final:
+        split_total = value.split(',')
+        cities.append(split_total[0])
+        countries.append(split_total[1])
+    dict_countries = {i: countries.count(i) for i in countries}
+    return dict_countries
+
+
+def print_total_visited(dict_countries):
+    for country, num_of_visits in dict_countries.items():
+        if num_of_visits > 1:
+            print(f"{country} - {num_of_visits} times")
+        else:
+            print(f"{country}")
+
 
 if __name__ == "__main__":
     # Vars initialization
     total_turns = 0
     total_co2_wasted = 0.0
     all_places_visited = []
+    cities = []
+    countries = []
     flight_range = 800
     total_dist = 0.0
     colorama.init(autoreset=True)
@@ -318,7 +344,7 @@ if __name__ == "__main__":
     # Add new user to the DB if it doesn't exist
     if search_username() == 0:
         add_username(username)
-    #print(f"Welcome, {username}!")
+    # print(f"Welcome, {username}!")
 
     # Grab current player ID and assign a new game_id for this session so we can log the player's movements
     game_id = get_game_id()
@@ -356,8 +382,8 @@ if __name__ == "__main__":
         total_co2_wasted += co2_calculator(generated_5_airports)
         total_dist += total_travel_distance(travel_from, travel_to)
         total_turns += 1
-        small_airplane()
-        landing_ascii()
+        # small_airplane()
+        # landing_ascii()
         print(f"You're now in {Fore.LIGHTGREEN_EX}{current_city_country}.\n")
         for city_from_gen_list in generated_5_airports:
             if (current_location[-1], current_location[-2]) in generated_5_airports:
@@ -366,7 +392,7 @@ if __name__ == "__main__":
                     break
                 print(f"Nicely done!\n"
                       f"You have delivered a package to {current_location[-1]} - one of your target destinations.\n"
-                f"Now you dropped some cargo so your co2 emission decreased to {co2_per_trip(generated_5_airports)} "
+                      f"Now you dropped some cargo so your co2 emission decreased to {co2_per_trip(generated_5_airports)} "
                       f"kg per km.")
                 print(f"You have the following destinations left:")
                 print_airports(generated_5_airports)
@@ -376,10 +402,10 @@ if __name__ == "__main__":
                 print(f"You need to deliver your package to the following airport(s) in: \n")
                 print_airports(generated_5_airports)
                 break
-        # Uncomment when debugging if needed - Remove later
-        # print(generated_5_airports)
-    print(f"Congratulations!!!\n You have reached your final destination and finished the game!")
-    print(f" You have visited: {', '.join(all_places_visited)}")  # FIX to make it fancy
+    print(f"Congratulations!!!\nYou have reached your final destination and finished the game!")
+    dict_visits = convert_list_to_dict(all_places_visited)
+    print(f"You have visited: {len(dict_visits)} countries:")
+    print_total_visited(dict_visits)
     print(f"It took you {total_turns} turns to deliver all the packages.\n"
           f"The total travelled distance is {total_dist:.2f} km.\n"
           f"The total carbon emission is {total_co2_wasted:.2f} kg CO2\n"
