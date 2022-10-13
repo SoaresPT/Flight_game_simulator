@@ -256,19 +256,19 @@ def landing_ascii():
 
 
 def small_airplane():
-    print(f"{Fore.LIGHTWHITE_EX}Flying to {current_city_country}")
     for i in range(0, 5):
+        print(f"{Fore.LIGHTWHITE_EX}Flying to {Fore.LIGHTGREEN_EX}{current_city_country}")
         print(f'''{Fore.LIGHTWHITE_EX}
         
-{i * "          "}              _
-{i * "          "}            -=\`\\
-{i * "          "}        |\ ____\_\__
-{i * "          "}    -=\c`""""""" "` )
-{i * "          "}        `~~~~~/ /~~`
-{i * "          "}            -==/ /
-{i * "          "}              '-'
+{i * "                    "}              _
+{i * "                    "}            -=\`\\
+{i * "                    "}        |\ ____\_\__
+{i * "                    "}    -=\c`""""""" "` )
+{i * "                    "}        `~~~~~/ /~~`
+{i * "                    "}            -==/ /
+{i * "                    "}              '-'
         ''')
-        time.sleep(0.7)
+        time.sleep(0.6)
         clear_screen()
 
 
@@ -361,23 +361,23 @@ if __name__ == "__main__":
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}Your mission is to deliver packages to the airports listed in your flight task.")
     time.sleep(2)
-    print(f"{Fore.LIGHTWHITE_EX}You are flying {Fore.LIGHTGREEN_EX}Boeing 737-400{Fore.LIGHTWHITE_EX} with "
+    print(f"{Fore.LIGHTWHITE_EX}You are flying a {Fore.LIGHTGREEN_EX}Boeing 737-400{Fore.LIGHTWHITE_EX} with "
           f"the payload of {Fore.LIGHTGREEN_EX}23.000 kg{Fore.LIGHTWHITE_EX} and flight range is restricted "
           f"to {Fore.LIGHTGREEN_EX}{flight_range} km{Fore.LIGHTWHITE_EX} due to fuel constrains.")
     time.sleep(2)
-    print(f"{Fore.LIGHTWHITE_EX}If you can't reach your target destination directly, you have to fly by cities that"
+    print(f"{Fore.LIGHTWHITE_EX}If you can't reach your target destination directly, you have to fly to cities that"
           f" are on the way, and refill the fuel tank.")
     time.sleep(2)
-    print(f"{Fore.LIGHTWHITE_EX}Try using most efficient routs in order to generate less carbon footprint &"
+    print(f"{Fore.LIGHTWHITE_EX}Try using the most efficient routes in order to generate less carbon footprint &"
           f" save company's operational costs.")
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}From your starting point you are leaving fully loaded with cargo, and your CO2 emission"
-          f" is {Fore.LIGHTRED_EX}{co2_per_trip(generated_5_airports)} kg{Fore.LIGHTWHITE_EX} per km")
+          f" is {Fore.LIGHTRED_EX}{co2_per_trip(generated_5_airports)} kg{Fore.LIGHTWHITE_EX} per km.")
     time.sleep(2)
     print(f"{Fore.RED}{Style.BRIGHT}HINT: The fewer packages you carry, the less CO2 emission you generate!")
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}Last but not least, if your total carbon footprint after you deliver your last package"
-          f" is under{Fore.LIGHTGREEN_EX} 100.000 kg CO2 {Fore.LIGHTWHITE_EX}, you will get a bonus!")
+          f" is under{Fore.LIGHTGREEN_EX} 100.000 kg CO2 {Fore.LIGHTWHITE_EX}, you will get a bonus!\n")
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}You starting position is {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTWHITE_EX}."
           f" Good luck & have fun!")
