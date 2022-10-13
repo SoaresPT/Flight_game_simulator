@@ -12,7 +12,6 @@ from colorama import Fore, Back, Style
 Basic Connection Functions
 """
 
-
 def config(filename='database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
@@ -94,10 +93,6 @@ def airports_nearby():
         if distance.distance(coords[2:4], current_location[2:4]).km < flight_range:
             reachable_airports.append(coords)
     return reachable_airports
-
-
-# add debug if number out of the list. Later on
-
 
 def flight_target(airports: list):
     print("")
@@ -219,7 +214,6 @@ def add_username(username: str):
         add_new_user = f"INSERT INTO player(username) VALUES ('{username}')"
         cur.execute(add_new_user)
         conn.commit()
-        # print(f"{username} has been added to the database!")
     except (Exception, psycopg2.DatabaseError) as error:
         print(f"{Fore.RED}{error}")
 
@@ -262,8 +256,6 @@ def landing_ascii():
 
 
 def small_airplane():
-    # size = os.get_terminal_size()
-    # print(size.columns)
     print(f"{Fore.LIGHTWHITE_EX}Flying to {current_city_country}")
     for i in range(0, 5):
         print(f'''{Fore.LIGHTWHITE_EX}
@@ -278,7 +270,6 @@ def small_airplane():
         ''')
         time.sleep(0.7)
         clear_screen()
-    # clear_screen()
 
 
 def clear_screen():
@@ -326,8 +317,6 @@ if __name__ == "__main__":
     total_dist = 0.0
     co2_bonus_limit = 100_000
     colorama.init(autoreset=True)
-    # Colorama video tutorial : https://youtu.be/u51Zjlnui4Y?t=475
-    # Colorama colors list : https://stackoverflow.com/q/61686780
 
     # Call login screen at the start of the game
     login_screen()
@@ -358,7 +347,6 @@ if __name__ == "__main__":
     # Add new user to the DB if it doesn't exist
     if search_username() == 0:
         add_username(username)
-    # print(f"Welcome, {username}!")
 
     # Grab current player ID and assign a new game_id for this session so we can log the player's movements
     game_id = get_game_id()
@@ -455,25 +443,6 @@ if __name__ == "__main__":
     bonus(total_co2_wasted)
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}Thank you for playing! Hope you enjoyed.")
-
-
-
-    # Remove comments below when understand how co2 emission calculated
-
-    # CO2 emissions from aviation fuel are 3.15 grams per gram of fuel [38],
-    # which gives CO2 emissions from a Boeing 737-400 of 115 g per passenger per km.
-    # At a cruising speed of 780 km per hour [Wikipedia, 28.2. 08],
-    # this is equivalent to 90 kg CO2 per passenger per hour.
-
-    # co2 full plane 4203.8 * 101km
-    # 41,62kg per 1km
-    # cargo max 23000 == 288pas*80kg
-    # https://www.icao.int/environmental-protection/Carbonoffset/Pages/default.aspx
-    # 41.62 kg CO2 per 1 km - 5 packages
-    # 33.24 kg CO2 per 1 km - 4 packages
-    # 25.00 kg CO2 per 1 km - 3 packages
-    # 16.62 kg CO2 per 1 km - 2 packages
-    # 8.24 kg CO2 per 1 km - 1 package
 
     # forcefully closing this to be 100% sure no connection gets stuck
     close_db_connection()
