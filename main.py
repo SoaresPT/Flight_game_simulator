@@ -377,7 +377,7 @@ if __name__ == "__main__":
     print(f"{Fore.RED}{Style.BRIGHT}HINT: The fewer packages you carry, the less CO2 emission you generate!")
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}Last but not least, if your total carbon footprint after you deliver your last package"
-          f" is under{Fore.LIGHTGREEN_EX} 100.000 kg CO2 {Fore.LIGHTWHITE_EX}, you will get a bonus!\n")
+          f" is under{Fore.LIGHTGREEN_EX} 100.000 kg CO2{Fore.LIGHTWHITE_EX}, you will get a bonus!\n")
     time.sleep(2)
     print(f"{Fore.LIGHTWHITE_EX}You starting position is {Fore.LIGHTGREEN_EX}{current_city_country}{Fore.LIGHTWHITE_EX}."
           f" Good luck & have fun!")
